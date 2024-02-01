@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
+import base64
 
 # Hàm tìm kiếm và trích xuất mã số
 def extract_code(description, pattern):
@@ -28,7 +29,13 @@ def main():
     uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
     if uploaded_file is not None:
-        pattern = st.text_input("Enter the pattern:")
+        # Dropdown for pattern selection
+        pattern_option = st.selectbox("Select the pattern year:", ["2023", "2024"])
+
+        # Mapping pattern options to actual regex patterns
+        pattern_mapping = {"2023": r'2300\d{3}', "2024": r'2400\d{3}'}
+        pattern = pattern_mapping[pattern_option]
+
         output_name = st.text_input("Enter the output file name:", "output.xlsx")
 
         if st.button("Process"):
