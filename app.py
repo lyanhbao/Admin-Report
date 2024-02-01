@@ -3,38 +3,47 @@ import pandas as pd
 import re
 
 # Hàm tìm kiếm và trích xuất mã số
-def extract_code(description):
+def extract_code(description, pattern):
     if pd.notnull(description):
-        # Tìm tất cả các chuỗi phù hợp với mẫu '2300xxx'
-        matches = re.findall('2300\d{3}', description)
-        # Trả về chuỗi đầu tiên phù hợp hoặc None nếu không có chuỗi nào phù hợp
+        matches = re.findall(pattern, description)
         return matches[0] if matches else None
     else:
-        # Trả về None nếu giá trị không phải là chuỗi
         return None
 
-# Hàm xử lý khi người dùng tải lên file
-def process_uploaded_file(uploaded_file):
-    # Đọc file vào DataFrame
-    df = pd.read_excel(uploaded_file)
-    
-    # Tạo cột mới 'Code' bằng cách áp dụng hàm extract_code trên cột 'Description'
-    df['Code'] = df['Description'].apply(extract_code)
-    
-    # Hiển thị DataFrame đã được cập nhật
-    st.dataframe(df)
-    
-    # Lưu kết quả vào một tệp Excel mới
-    df.to_excel('updated_test_data.xlsx', index=False)
-    st.success("Dữ liệu đã được cập nhật và lưu vào tệp 'updated_test_data.xlsx'")
+def process_file(file, pattern, output_name):
+    # Read the file into a DataFrame
+    df = pd.read_excel(file)
 
-# Tiêu đề ứng dụng
-st.title("Ứng dụng Streamlit cho xử lý dữ liệu Excel")
+    # Apply the extract_code function
+    df['Code'] = df['Description'].apply(lambda desc: extract_code(desc, pattern))
 
-# Nút tải lên file
-uploaded_file = st.file_uploader("Chọn một file Excel", type=["xlsx", "xls"])
+    # Save to a new Excel file
+    df.to_excel(output_name, index=False)
 
-# Kiểm tra xem người dùng đã tải lên file chưa
-if uploaded_file is not None:
-    # Xử lý file đã tải lên
-    process_uploaded_file(uploaded_file)
+    return df
+
+def main():
+    st.title("Code Extractor App")
+
+    uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
+
+    if uploaded_file is not None:
+        pattern = st.text_input("Enter the pattern:")
+        output_name = st.text_input("Enter the output file name:", "output.xlsx")
+
+        if st.button("Process"):
+            df_result = process_file(uploaded_file, pattern, output_name)
+            st.dataframe(df_result)
+
+            st.success(f"File processed successfully. Download your result: [{output_name}]")
+            st.markdown(get_binary_file_downloader_html(output_name), unsafe_allow_html=True)
+
+def get_binary_file_downloader_html(file_path):
+    with open(file_path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    href = f'<a href="data:file/xlsx;base64,{b64}" download="{file_path}">Download {file_path}</a>'
+    return href
+
+if __name__ == "__main__":
+    main()
