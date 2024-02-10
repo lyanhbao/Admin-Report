@@ -52,5 +52,24 @@ def get_binary_file_downloader_html(file_path):
     href = f'<a href="data:file/xlsx;base64,{b64}" download="{file_path}">Download {file_path}</a>'
     return href
 
+def main():
+    st.markdown("""
+    <style>
+    body { 
+        background-color: #f0f5f9; /* Soft background color */
+        font-family: 'Arial', sans-serif;
+    }
+    .stButton > button { 
+        background-color: #007bff; /* Blue button */
+        color: white;
+        border: none;  /* Optional: Remove default border */
+        padding: 10px 20px; /* Adjust padding to your liking */
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.title("Code Extractor App")
+    # ... (rest of your main function's code)
+
 if __name__ == "__main__":
     main()
