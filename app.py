@@ -179,9 +179,9 @@ def process_google_ads_logic(uploaded_file, rows, merged_df):
         rows[8][1]
     ])
 
-    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID","Account","Account budget","Purchase Order","Description","Quantity","Units","Amount"])
-    df2 = df2[df2['Account'] != 'Account']
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID","Order name","Account budget","Purchase Order","Description","Quantity","Units","Amount"])
     df2.reset_index(drop=True, inplace=True)
+    df2 = df2[df2['Order name'] != 'Account']
     df2['source_name'] = uploaded_file.name
 
     new_data_df = pd.DataFrame(new_data[1:], columns=new_data[0])
