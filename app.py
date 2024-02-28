@@ -4,6 +4,7 @@ import csv
 from io import StringIO
 import base64
 import re  # Import the regex module
+from openpyxl.utils.exceptions import IllegalCharacterError
 
 def classify_file_type(rows):
     if "Product" in rows[7] and rows[7][1] == "Display and Video 360":
@@ -454,14 +455,17 @@ def remove_columns_without_header(df):
     return df
 
 def process_file(output_name, df):
-    # Áp dụng hàm extract_code
+    # Apply the extract_code function
     df['Code'] = df['Description'].apply(lambda desc: extract_code(desc))
 
-    # Loại bỏ các cột không có tiêu đề
+    # Remove columns without headers
     df = remove_columns_without_header(df)
 
-    # Lưu vào tệp Excel
-    df.to_excel(output_name, index=False)
+    # Save to Excel file
+    try:
+        df.to_excel(output_name, index=False)
+    except IllegalCharacterError as e:
+        st.error(f"Error writing to Excel: {e}. Some special characters may not be supported.")
     
     return df
 
