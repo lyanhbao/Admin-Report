@@ -272,7 +272,7 @@ def process_youtube_reservation_logic(uploaded_file, rows, merged_df):
     "Quantity Billed",
     "Amount"
 ])
-    df2 = df2.dropna(subset=[''])
+    df2 = df2.dropna(subset=['Order name'])
     df2 = df2[df2['Order name'] != 'Order name']
     df2.reset_index(drop=True, inplace=True)
     df2['source_name'] = uploaded_file.name
