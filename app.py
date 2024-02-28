@@ -93,10 +93,10 @@ def process_case_1(uploaded_file, rows, merged_df):
         rows[8][1]
     ])
 
-    df2 = pd.DataFrame(rows[split_index:], columns=["Order name", "Purchase Order", 
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account", "Purchase Order", 
     "Description", "Quantity", "UOM", "Amount"])
-    df2 = df2.dropna(subset=['Order name'])
-    df2 = df2[df2['Order name'] != 'Order name']
+    df2 = df2.dropna(subset=['Account'])
+    df2 = df2[df2['Account'] != 'Account']
     df2.reset_index(drop=True, inplace=True)
     df2['source_name'] = uploaded_file.name
 
@@ -136,10 +136,10 @@ def process_case_2(uploaded_file, rows, merged_df):
         rows[7][1]
     ])
 
-    df2 = pd.DataFrame(rows[split_index:], columns=["Order name", "Purchase Order", 
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account", "Purchase Order", 
     "Description", "Quantity", "UOM", "Amount"])
-    df2 = df2.dropna(subset=['Order name'])
-    df2 = df2[df2['Order name'] != 'Order name']
+    df2 = df2.dropna(subset=['Account'])
+    df2 = df2[df2['Account'] != 'Account']
     df2.reset_index(drop=True, inplace=True)
     df2['source_name'] = uploaded_file.name
 
@@ -220,9 +220,9 @@ def process_cm360_logic(uploaded_file, rows, merged_df):
         rows[8][1]
     ])
 
-    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",	"Order name",	"Purchase Order",	"Description",	"UOM",	"Unit Price",	"Quantity",	"Amount"])
-    df2 = df2.dropna(subset=['Order name'])
-    df2 = df2[df2['Order name'] != 'Order name']
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",	"Account",	"Purchase Order",	"Description",	"UOM",	"Unit Price",	"Quantity",	"Amount"])
+    df2 = df2.dropna(subset=['Account'])
+    df2 = df2[df2['Account'] != 'Account']
     df2.reset_index(drop=True, inplace=True)
     df2['source_name'] = uploaded_file.name
 
@@ -263,17 +263,17 @@ def process_youtube_reservation_logic(uploaded_file, rows, merged_df):
     ])
 
     df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",
-    "Order name",
+    "Account",
     "Purchase Order",
     "Description",
     "Start/End Dates",
     "Rate",
-    "Quantity Served",
+    "Quantity",
     "Quantity Billed",
     "Amount"
 ])
-    df2 = df2.dropna(subset=['Order name'])
-    df2 = df2[df2['Order name'] != 'Order name']
+    df2 = df2.dropna(subset=[''])
+    df2 = df2[df2['Account'] != 'Account']
     df2.reset_index(drop=True, inplace=True)
     df2['source_name'] = uploaded_file.name
 
