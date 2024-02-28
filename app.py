@@ -6,8 +6,14 @@ import base64
 import re  # Import the regex module
 
 def classify_file_type(rows):
-    if "Product" in rows[7]:
+    if "Product" in rows[7] and rows[7][1] == "Display and Video 360":
         return "DV 360 - Case 2"
+    elif "Product" in rows[7] and rows[7][1] == "Google Ads":
+        return "Google Ads case 2"
+    elif "Product" in rows[7] and rows[7][1] == "Campaign Manager 360":
+        return "CM360 case 2"
+    elif "Product" in rows[7] and rows[7][1] == "YouTube Reservation":
+        return "YouTube Reservation case 2"
     elif rows[8][1] == "Display and Video 360":
         return "DV 360 - Case 1"
     elif rows[8][1] == "Google Ads":
@@ -37,10 +43,16 @@ def split_and_convert_data(input_files):
             merged_df = process_case_2(uploaded_file, rows, merged_df)
         elif file_type == "Google Ads":
             merged_df = process_google_ads_logic(uploaded_file, rows, merged_df)
+        elif file_type == "Google Ads case 2":
+            merged_df = process_google_ads_logic_2(uploaded_file, rows, merged_df)        
         elif file_type == "CM360":
             merged_df = process_cm360_logic(uploaded_file, rows, merged_df)
+        elif file_type == "CM360 case 2":
+            merged_df = process_cm360_logic_2(uploaded_file, rows, merged_df)
         elif file_type == "YouTube Reservation":
             merged_df = process_youtube_reservation_logic(uploaded_file, rows, merged_df)
+        elif file_type == "YouTube Reservation case 2":
+            merged_df = process_youtube_reservation_logic_2(uploaded_file, rows, merged_df)
         else:
             st.warning("Unknown file type. Skipping processing for this file.")
 
@@ -192,6 +204,47 @@ def process_google_ads_logic(uploaded_file, rows, merged_df):
     merged_df = merged_df.dropna(subset=['Description'])
     merged_df = merged_df.drop_duplicates()
     return merged_df
+def process_google_ads_logic_2(uploaded_file, rows, merged_df):
+    split_index = 0
+    count_empty_lines = 0
+    for idx, row in enumerate(rows):
+        if not row:
+            count_empty_lines += 1
+            if count_empty_lines == 2:
+                split_index = idx + 1
+                break
+
+    header = [
+        "Bill to", "Invoice number", "Invoice date","Due Date", "Billing ID",
+        "Currency", "Invoice amount", "", "Product"
+    ]
+
+    new_data = [header]
+    new_data.append([
+        rows[0][1],
+        rows[1][1],
+        rows[2][1],
+        None,
+        rows[3][1],
+        rows[4][1],
+        rows[5][1],
+        "",
+        rows[7][1]
+    ])
+
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID","Order name","Account budget","Purchase Order","Description","Quantity","Units","Amount"])
+    df2.reset_index(drop=True, inplace=True)
+    df2 = df2[df2['Order name'] != 'Account']
+    df2['source_name'] = uploaded_file.name
+
+    new_data_df = pd.DataFrame(new_data[1:], columns=new_data[0])
+    new_data_df['source_name'] = uploaded_file.name
+    new_data_df = new_data_df.dropna(subset=['Billing ID'])
+
+    merged_df = pd.concat([merged_df, new_data_df.merge(df2, on='source_name', how='inner')], ignore_index=True)
+    merged_df = merged_df.dropna(subset=['Description'])
+    merged_df = merged_df.drop_duplicates()
+    return merged_df
 def process_cm360_logic(uploaded_file, rows, merged_df):
     split_index = 0
     count_empty_lines = 0
@@ -234,6 +287,48 @@ def process_cm360_logic(uploaded_file, rows, merged_df):
     merged_df = merged_df.dropna(subset=['Description'])
     merged_df = merged_df.drop_duplicates()
     return merged_df
+def process_cm360_logic_2(uploaded_file, rows, merged_df):
+    split_index = 0
+    count_empty_lines = 0
+    for idx, row in enumerate(rows):
+        if not row:
+            count_empty_lines += 1
+            if count_empty_lines == 2:
+                split_index = idx + 1
+                break
+
+    header = [
+        "Bill to", "Invoice number", "Invoice date","Due Date", "Billing ID",
+        "Currency", "Invoice amount", "", "Product"
+    ]
+
+    new_data = [header]
+    new_data.append([
+        rows[0][1],
+        rows[1][1],
+        rows[2][1],
+        None,
+        rows[3][1],
+        rows[4][1],
+        rows[5][1],
+        "",
+        rows[7][1]
+    ])
+
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",	"Order name",	"Purchase Order",	"Description",	"UOM",	"Unit Price",	"Quantity",	"Amount"])
+    df2 = df2.dropna(subset=['Order name'])
+    df2 = df2[df2['Order name'] != 'Order name']
+    df2.reset_index(drop=True, inplace=True)
+    df2['source_name'] = uploaded_file.name
+
+    new_data_df = pd.DataFrame(new_data[1:], columns=new_data[0])
+    new_data_df['source_name'] = uploaded_file.name
+    new_data_df = new_data_df.dropna(subset=['Billing ID'])
+
+    merged_df = pd.concat([merged_df, new_data_df.merge(df2, on='source_name', how='inner')], ignore_index=True)
+    merged_df = merged_df.dropna(subset=['Description'])
+    merged_df = merged_df.drop_duplicates()
+    return merged_df
 def process_youtube_reservation_logic(uploaded_file, rows, merged_df):
     split_index = 0
     count_empty_lines = 0
@@ -260,6 +355,57 @@ def process_youtube_reservation_logic(uploaded_file, rows, merged_df):
         rows[6][1],
         "",
         rows[8][1]
+    ])
+
+    df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",
+    "Order name",
+    "Purchase Order",
+    "Description",
+    "Start/End Dates",
+    "Rate",
+    "Quantity",
+    "Quantity Billed",
+    "Amount"
+])
+    df2 = df2.dropna(subset=['Order name'])
+    df2 = df2[df2['Order name'] != 'Order name']
+    df2.reset_index(drop=True, inplace=True)
+    df2['source_name'] = uploaded_file.name
+
+    new_data_df = pd.DataFrame(new_data[1:], columns=new_data[0])
+    new_data_df['source_name'] = uploaded_file.name
+    new_data_df = new_data_df.dropna(subset=['Billing ID'])
+
+    merged_df = pd.concat([merged_df, new_data_df.merge(df2, on='source_name', how='inner')], ignore_index=True)
+    merged_df = merged_df.dropna(subset=['Description'])
+    merged_df = merged_df.drop_duplicates()
+    return merged_df
+def process_youtube_reservation_logic_2(uploaded_file, rows, merged_df):
+    split_index = 0
+    count_empty_lines = 0
+    for idx, row in enumerate(rows):
+        if not row:
+            count_empty_lines += 1
+            if count_empty_lines == 2:
+                split_index = idx + 1
+                break
+
+    header = [
+        "Bill to", "Invoice number", "Invoice date","Due Date", "Billing ID",
+        "Currency", "Invoice amount", "", "Product"
+    ]
+
+    new_data = [header]
+    new_data.append([
+        rows[0][1],
+        rows[1][1],
+        rows[2][1],
+        None,
+        rows[3][1],
+        rows[4][1],
+        rows[5][1],
+        "",
+        rows[7][1]
     ])
 
     df2 = pd.DataFrame(rows[split_index:], columns=["Account ID",
