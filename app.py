@@ -462,7 +462,8 @@ def process_file(output_name, df):
 
     # Remove columns without headers
     df = remove_columns_without_header(df)
-        # Drop columns with all NaN values
+    
+    # Drop columns with all NaN values
     if len(df.columns) > 7:  # Check if DataFrame has at least 8 columns
         df.drop(df.columns[7], axis=1, inplace=True)
 
