@@ -63,6 +63,8 @@ def split_and_convert_data(input_files):
     return merged_df
 def extract_code(description):
     if pd.notnull(description):
+        # Replace '|' with '_'
+        description = description.replace('|', '_')
         # Tìm tất cả các chuỗi phù hợp với mẫu '2300xxx'
         matches_2300 = re.findall('2300\d{3}', description)
         # Tìm tất cả các chuỗi phù hợp với mẫu '2400xxx'
