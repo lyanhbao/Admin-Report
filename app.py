@@ -462,15 +462,17 @@ def process_file(output_name, df):
 
     # Remove columns without headers
     df = remove_columns_without_header(df)
+        # Drop columns with all NaN values
+    if len(df.columns) > 7:  # Check if DataFrame has at least 8 columns
+        df.drop(df.columns[7], axis=1, inplace=True)
 
-    # Save to Excel file
+    # Save to CSV file
     try:
-        df.to_excel(output_name, index=False)
-    except IllegalCharacterError as e:
-        st.error(f"Error writing to Excel: {e}. Some special characters may not be supported.")
+        df.to_csv(output_name, index=False)  # Export DataFrame to CSV
+    except Exception as e:
+        st.error(f"Error writing to CSV: {e}.")
     
     return df
-
 
 def get_csv_download_link(df):
     csv = df.to_csv(index=False)
@@ -486,6 +488,12 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{bin_file}">Download {file_label}</a>'
     return href
 
+def remove_special_characters(text):
+    # Sử dụng biểu thức chính quy để loại bỏ ký tự đặc biệt
+    return re.sub(r'[^\w\s]', '', text)
+
+# Áp dụng hàm remove_special_characters cho cột 'Description'
+    df['Description'] = df['Description'].apply(remove_special_characters)
 
 if __name__ == "__main__":
     main()
