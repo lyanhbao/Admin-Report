@@ -442,7 +442,7 @@ def main():
         st.write("Files successfully uploaded.")
 
         merged_df = split_and_convert_data(uploaded_files)
-        output_name = st.text_input("Enter the output file name:", "output.xlsx")
+        output_name = st.text_input("Enter the output file name:", "output.csv")
 
         df_result = process_file(output_name, merged_df)
         st.dataframe(df_result.drop(columns=['source_name']))
